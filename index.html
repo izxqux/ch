@@ -1,0 +1,774 @@
+<!--
+  --	@uthor IzXquX
+  -->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Campo Harmônico</title>
+	<link rel="shortcut icon" type="image/png" href="ch.png">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		body {
+			background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+			color: white;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			padding: 20px;
+		}
+
+		.container {
+			max-width: 800px;
+			width: 100%;
+			background-color: rgba(0, 0, 0, 0.7);
+			border-radius: 15px;
+			padding: 30px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+			margin-top: 20px;
+		}
+
+		h1 {
+			text-align: center;
+			margin-bottom: 20px;
+			font-size: 2.5rem;
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+		}
+
+		h2 {
+			margin-bottom: 15px;
+			text-align: center;
+		}
+
+		.screen {
+			display: none;
+		}
+
+		.active {
+			display: block;
+		}
+
+		.btn {
+			background: linear-gradient(to right, #3498db, #2980b9, #085689);
+			color: white;
+			border: none;
+			padding: 12px 25px;
+			margin: 10px;
+			border-radius: 50px;
+			cursor: pointer;
+			font-size: 1rem;
+			font-weight: bold;
+			transition: all 0.3s ease;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+		}
+
+		.btn:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+		}
+
+		.btn-secondary {
+			background: linear-gradient(to right, #e74c3c, #c0392b, #801c11);
+		}
+
+		.btn-success {
+			background: linear-gradient(to right, #2ecc71, #27ae60, #0b6c34);
+		}
+
+		.btn-warning {
+			background: linear-gradient(to right, #e74c3c, #c0392b, #801c11);
+		}
+
+		.note-buttons {
+			display: grid;
+			grid-template-columns: repeat(6, 1fr);
+			gap: 10px;
+			margin: 20px 0;
+		}
+
+		.note-btn {
+			background: linear-gradient(to right, #9b59b6, #8e44ad, #43025e);
+			color: white;
+			border: none;
+			padding: 12px;
+			border-radius: 10px;
+			cursor: pointer;
+			font-size: 1.2rem;
+			font-weight: bold;
+			transition: all 0.3s ease;
+		}
+
+		.note-btn:hover {
+			transform: scale(1.05);
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+		}
+
+		.game-info {
+			background-color: rgba(255, 255, 255, 0.1);
+			padding: 15px;
+			border-radius: 10px;
+			margin: 20px 0;
+		}
+
+		.progress-bar {
+			height: 20px;
+			background-color: rgba(255, 255, 255, 0.2);
+			border-radius: 10px;
+			margin: 15px 0;
+			overflow: hidden;
+		}
+
+		.progress {
+			height: 100%;
+			background: linear-gradient(to right, #2ecc71, #27ae60);
+			width: 0%;
+			transition: width 0.5s ease;
+		}
+
+		.answer-buttons {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 10px;
+			margin: 20px 0;
+		}
+
+		.answer-btn {
+			background: linear-gradient(to right, #3498db, #2980b9, #085689);
+			color: white;
+			border: none;
+			padding: 15px;
+			border-radius: 10px;
+			cursor: pointer;
+			font-size: 1.1rem;
+			font-weight: bold;
+			transition: all 0.3s ease;
+		}
+
+		.answer-btn:hover {
+			transform: scale(1.05);
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+		}
+
+		.feedback {
+			text-align: center;
+			font-size: 1.5rem;
+			font-weight: bold;
+			margin: 20px 0;
+			min-height: 40px;
+		}
+
+		.correct {
+			color: #2ecc71;
+		}
+
+		.incorrect {
+			color: #e74c3c;
+		}
+
+		.used-notes {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin: 15px 0;
+			justify-content: center;
+		}
+
+		.used-note {
+			background-color: rgba(255, 255, 255, 0.2);
+			padding: 8px 15px;
+			border-radius: 20px;
+			font-weight: bold;
+			min-width: 60px;
+			text-align: center;
+		}
+
+		.used-note.current {
+			background-color: #085689;
+		}
+
+		.used-note.answered {
+			background-color: #0b6c34;
+		}
+
+		.used-note.incorrect {
+			background-color: #801c11;
+		}
+
+		.sound-control {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 15px 0;
+			gap: 10px;
+		}
+
+		.sound-btn {
+			background: linear-gradient(to right, #9b59b6, #8e44ad, #43025e);
+			color: white;
+			border: none;
+			padding: 8px 15px;
+			border-radius: 20px;
+			cursor: pointer;
+			font-size: 0.9rem;
+			font-weight: bold;
+		}
+
+		.chord-info {
+			font-size: 1.2rem;
+			margin: 10px 0;
+			text-align: center;
+		}
+
+		.sound-duration-control {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 15px 0;
+			gap: 10px;
+		}
+
+		.duration-input {
+			background: rgba(255, 255, 255, 0.1);
+			border: 2px solid #3498db;
+			color: white;
+			padding: 8px 15px;
+			border-radius: 20px;
+			font-size: 1rem;
+			width: 80px;
+			text-align: center;
+		}
+
+		
+
+		@media (max-width: 768px) {
+			.note-buttons {
+				grid-template-columns: repeat(3, 1fr);
+			}
+			
+			.answer-buttons {
+				grid-template-columns: 1fr;
+			}
+			
+			h1 {
+				font-size: 2rem;
+			}
+			
+			.container {
+				padding: 15px;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.note-buttons {
+				grid-template-columns: repeat(2, 1fr);
+			}
+			
+			h1 {
+				font-size: 1.7rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>Campo Harmônico</h1>
+		
+		<!-- Tela inicial -->
+		<div id="home-screen" class="screen active">
+			<div class="game-info">
+				<p>Teste seu conhecimento sobre os acordes do campo harmônico!</p>
+				<p>Escolha um tom específico ou deixe o jogo escolher um tom aleatório para você.</p>
+			</div>
+			<div class="sound-control">
+				<span>Som:</span>
+				<button id="toggle-sound" class="sound-btn">Ligado</button>
+			</div>
+			<div class="sound-duration-control">
+				<span>Duração do som (segundos):</span>
+				<input type="number" id="duration-setting" class="duration-input" min="0" max="5" value="1">
+			</div>
+			<div style="text-align: center; margin-top: 30px;">
+				<button id="choose-tone-btn" class="btn">Escolher Tom</button>
+				<button id="random-tone-btn" class="btn btn-secondary">Tom Aleatório</button>
+			</div>
+		</div>
+		
+		<!-- Tela de escolha de tom -->
+		<div id="choose-tone-screen" class="screen">
+			<h2>Escolha o Tom</h2>
+			<div class="note-buttons" id="note-buttons">
+				<!-- Botões de notas serão gerados via JavaScript -->
+			</div>
+			<div style="text-align: center; margin-top: 20px;">
+				<button id="back-to-home-btn" class="btn btn-warning">Voltar</button>
+			</div>
+		</div>
+		
+		<!-- Tela do jogo -->
+		<div id="game-screen" class="screen">
+			<div class="game-info">
+				<h2 id="current-tone">Tom: C</h2>
+				<p id="current-question">Qual é o acorde do grau 1?</p>
+				<div class="progress-bar">
+					<div id="progress" class="progress"></div>
+				</div>
+				<p>Progresso: <span id="current-degree">1</span>/7</p>
+			</div>
+			
+			<div class="used-notes" id="used-notes">
+				<!-- Acordes usados serão gerados via JavaScript -->
+			</div>
+			
+			<div class="answer-buttons" id="answer-buttons">
+				<!-- Botões de resposta serão gerados via JavaScript -->
+			</div>
+			
+			<div class="feedback" id="feedback"></div>
+			
+			<div style="text-align: center; margin-top: 20px;">
+				<button id="next-question-btn" class="btn btn-success" style="display: none;">Próxima Pergunta</button>
+				<button id="back-to-home-from-game-btn" class="btn btn-warning">Voltar ao Início</button>
+			</div>
+		</div>
+	</div>
+	<script defer>
+		// Notas musicais disponíveis
+		const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+		
+		// Graus do campo harmônico
+		const degrees = ['1°', '2°', '3°', '4°', '5°', '6°', '7°'];
+		
+		// Tipos de acorde para cada grau (0 = maior, 1 = menor, 2 = diminuto)
+		const chordTypes = [0, 1, 1, 0, 0, 1, 2];
+		
+		// Intervalos para cada grau (em semitons a partir da tônica)
+		const degreeIntervals = [0, 2, 4, 5, 7, 9, 11];
+		
+		// Estado do jogo
+		let gameState = {
+			currentTone: '',
+			currentDegree: 0,
+			usedChords: [],
+			correctAnswers: 0,
+			totalQuestions: 7,
+			randomDegrees: [],
+			soundEnabled: true,
+			soundDuration: 0,
+			activeOscillators: []
+		};
+
+		// Elementos da DOM
+		const homeScreen = document.getElementById('home-screen');
+		const chooseToneScreen = document.getElementById('choose-tone-screen');
+		const gameScreen = document.getElementById('game-screen');
+		const noteButtonsContainer = document.getElementById('note-buttons');
+		const answerButtonsContainer = document.getElementById('answer-buttons');
+		const usedNotesContainer = document.getElementById('used-notes');
+		const currentToneElement = document.getElementById('current-tone');
+		const currentQuestionElement = document.getElementById('current-question');
+		const currentDegreeElement = document.getElementById('current-degree');
+		const progressElement = document.getElementById('progress');
+		const feedbackElement = document.getElementById('feedback');
+		const nextQuestionBtn = document.getElementById('next-question-btn');
+		const toggleSoundBtn = document.getElementById('toggle-sound');
+		const durationSetting = document.getElementById('duration-setting');
+
+		// Contexto de áudio
+		let audioContext;
+		
+		// Inicialização
+		document.addEventListener('DOMContentLoaded', function() {
+			// Inicializar contexto de áudio
+			try {
+				audioContext = new (window.AudioContext || window.webkitAudioContext)();
+			} catch (e) {
+				console.log('Web Audio API não suportada neste navegador');
+				gameState.soundEnabled = false;
+				toggleSoundBtn.textContent = 'Não Suportado';
+				toggleSoundBtn.disabled = true;
+			}
+			
+			// Criar botões de notas
+			notes.forEach(note => {
+				const button = document.createElement('button');
+				button.className = 'note-btn';
+				button.textContent = note;
+				button.addEventListener('click', () => startGame(note));
+				noteButtonsContainer.appendChild(button);
+			});
+
+			// Event listeners para os botões principais
+			document.getElementById('choose-tone-btn').addEventListener('click', showChooseToneScreen);
+			document.getElementById('random-tone-btn').addEventListener('click', startRandomGame);
+			document.getElementById('back-to-home-btn').addEventListener('click', showHomeScreen);
+			document.getElementById('back-to-home-from-game-btn').addEventListener('click', showHomeScreen);
+			nextQuestionBtn.addEventListener('click', nextQuestion);
+			toggleSoundBtn.addEventListener('click', toggleSound);
+			
+			// Configurar duração do som
+			durationSetting.addEventListener('change', function() {
+				const value = parseFloat(this.value);
+				if (value < 0) this.value = 0;
+				if (value > 5) this.value = 5;
+				gameState.soundDuration = parseFloat(this.value);
+			});
+		});
+
+		// Parar todos os sons ativos
+		function stopAllSounds() {
+			gameState.activeOscillators.forEach(osc => {
+				try {
+					osc.stop();
+				} catch (e) {
+					// Oscilador já parado
+				}
+			});
+			gameState.activeOscillators = [];
+		}
+
+		// Tocar um acorde simples de teclado
+		function playKeyboardChord(chordSymbol) {
+			// Se duração for 0, não tocar som
+			if (gameState.soundDuration === 0 || !gameState.soundEnabled || !audioContext) return;
+			
+			// Parar sons anteriores
+			stopAllSounds();
+			
+			// Extrair a nota base e tipo do acorde
+			const baseNote = chordSymbol.replace('m', '').replace('º', '');
+			const isMinor = chordSymbol.includes('m');
+			const isDiminished = chordSymbol.includes('º');
+			
+			// Frequências das notas (oitava central)
+			const frequencies = {
+				'C': 261.63, 'C#': 277.18, 'D': 293.66, 'D#': 311.13,
+				'E': 329.63, 'F': 349.23, 'F#': 369.99, 'G': 392.00,
+				'G#': 415.30, 'A': 440.00, 'A#': 466.16, 'B': 493.88
+			};
+			
+			// Calcular as notas do acorde
+			const baseFreq = frequencies[baseNote] || 440;
+			let thirdFreq, fifthFreq;
+			
+			if (isMinor) {
+				// Acorde menor: terça menor (3 semitons), quinta justa (7 semitons)
+				thirdFreq = baseFreq * Math.pow(2, 3/12);
+				fifthFreq = baseFreq * Math.pow(2, 7/12);
+			} else if (isDiminished) {
+				// Acorde diminuto: terça menor (3 semitons), quinta diminuta (6 semitons)
+				thirdFreq = baseFreq * Math.pow(2, 3/12);
+				fifthFreq = baseFreq * Math.pow(2, 6/12);
+			} else {
+				// Acorde maior: terça maior (4 semitons), quinta justa (7 semitons)
+				thirdFreq = baseFreq * Math.pow(2, 4/12);
+				fifthFreq = baseFreq * Math.pow(2, 7/12);
+			}
+			
+			// Criar osciladores para cada nota do acorde
+			[baseFreq, thirdFreq, fifthFreq].forEach((freq, index) => {
+				const oscillator = audioContext.createOscillator();
+				const gainNode = audioContext.createGain();
+				
+				// Usar onda quadrada para som de teclado simples
+				oscillator.type = 'square';
+				oscillator.frequency.value = freq;
+				
+				// Configurar volume
+				const volume = 0.2;
+				
+				// Envelope simples - ataque rápido e release
+				const now = audioContext.currentTime;
+				gainNode.gain.setValueAtTime(0, now);
+				gainNode.gain.linearRampToValueAtTime(volume, now + 0.01);
+				gainNode.gain.exponentialRampToValueAtTime(0.001, now + gameState.soundDuration);
+				
+				oscillator.connect(gainNode);
+				gainNode.connect(audioContext.destination);
+				
+				oscillator.start();
+				oscillator.stop(now + gameState.soundDuration);
+				gameState.activeOscillators.push(oscillator);
+			});
+		}
+
+		// Funções para navegação entre telas
+		function showHomeScreen() {
+			hideAllScreens();
+			homeScreen.classList.add('active');
+			stopAllSounds();
+		}
+
+		function showChooseToneScreen() {
+			hideAllScreens();
+			chooseToneScreen.classList.add('active');
+			stopAllSounds();
+		}
+
+		function showGameScreen() {
+			hideAllScreens();
+			gameScreen.classList.add('active');
+		}
+
+		function hideAllScreens() {
+			homeScreen.classList.remove('active');
+			chooseToneScreen.classList.remove('active');
+			gameScreen.classList.remove('active');
+		}
+
+		// Alternar som
+		function toggleSound() {
+			gameState.soundEnabled = !gameState.soundEnabled;
+			toggleSoundBtn.textContent = gameState.soundEnabled ? 'Ligado' : 'Desligado';
+			if (!gameState.soundEnabled) {
+				stopAllSounds();
+			}
+		}
+
+		// Gerar ordem aleatória dos graus
+		function generateRandomDegrees() {
+			const degrees = [0, 1, 2, 3, 4, 5, 6];
+			return shuffleArray(degrees);
+		}
+
+		// Iniciar jogo com tom escolhido
+		function startGame(tone) {
+			gameState.currentTone = tone;
+			gameState.currentDegree = 0;
+			gameState.usedChords = [];
+			gameState.correctAnswers = 0;
+			gameState.randomDegrees = generateRandomDegrees();
+			gameState.soundDuration = parseFloat(durationSetting.value);
+			
+			showGameScreen();
+			updateGameDisplay();
+			generateQuestion();
+		}
+
+		// Iniciar jogo com tom aleatório
+		function startRandomGame() {
+			const randomIndex = Math.floor(Math.random() * notes.length);
+			startGame(notes[randomIndex]);
+		}
+
+		// Atualizar a exibição do jogo
+		function updateGameDisplay() {
+			currentToneElement.textContent = `Tom: ${gameState.currentTone}`;
+			currentDegreeElement.textContent = gameState.currentDegree + 1;
+			progressElement.style.width = `${(gameState.currentDegree / gameState.totalQuestions) * 100}%`;
+			
+			// Atualizar acordes usados
+			usedNotesContainer.innerHTML = '';
+			for (let i = 0; i < gameState.totalQuestions; i++) {
+				const chordElement = document.createElement('div');
+				chordElement.className = 'used-note';
+				
+				if (i < gameState.currentDegree) {
+					chordElement.textContent = gameState.usedChords[i] || '?';
+					if (gameState.usedChords[i] && gameState.usedChords[i] !== 'X') {
+						chordElement.classList.add('answered');
+					} else {
+						chordElement.classList.add('incorrect');
+					}
+				} else if (i === gameState.currentDegree) {
+					chordElement.textContent = '?';
+					chordElement.classList.add('current');
+				} else {
+					chordElement.textContent = '?';
+				}
+				
+				usedNotesContainer.appendChild(chordElement);
+			}
+		}
+
+		// Gerar pergunta atual
+		function generateQuestion() {
+			const degreeIndex = gameState.randomDegrees[gameState.currentDegree];
+			const correctChord = calculateChord(gameState.currentTone, degreeIndex);
+			
+			currentQuestionElement.textContent = `Qual é o acorde do grau ${degrees[degreeIndex]}?`;
+			
+			// Tocar o acorde da tônica (se som estiver ativo)
+			playKeyboardChord(gameState.currentTone);
+			
+			// Gerar opções de resposta
+			const options = generateAnswerOptions(correctChord, degreeIndex);
+			
+			// Limpar botões de resposta anteriores
+			answerButtonsContainer.innerHTML = '';
+			
+			// Adicionar botões de resposta
+			options.forEach(option => {
+				const button = document.createElement('button');
+				button.className = 'answer-btn';
+				button.textContent = option;
+				button.addEventListener('click', () => checkAnswer(option, correctChord, degreeIndex));
+				button.addEventListener('mouseenter', () => playKeyboardChord(option));
+				answerButtonsContainer.appendChild(button);
+			});
+			
+			// Esconder feedback e botão de próxima pergunta
+			feedbackElement.textContent = '';
+			feedbackElement.className = 'feedback';
+			nextQuestionBtn.style.display = 'none';
+		}
+
+		// Calcular o acorde correto para um grau específico
+		function calculateChord(tone, degreeIndex) {
+			const toneIndex = notes.indexOf(tone);
+			const noteIndex = (toneIndex + degreeIntervals[degreeIndex]) % notes.length;
+			const baseNote = notes[noteIndex];
+			
+			// Adicionar o tipo de acorde
+			switch(chordTypes[degreeIndex]) {
+				case 0: // Maior
+					return baseNote;
+				case 1: // Menor
+					return baseNote + 'm';
+				case 2: // Diminuto
+					return baseNote + 'º';
+			}
+		}
+
+		// Gerar opções de resposta (incluindo a correta)
+		function generateAnswerOptions(correctChord, degreeIndex) {
+			const options = [correctChord];
+			
+			// Adicionar acordes incorretos
+			while (options.length < 4) {
+				const randomIndex = Math.floor(Math.random() * notes.length);
+				const randomNote = notes[randomIndex];
+				
+				// Gerar tipo de acorde aleatório (0, 1, 2)
+				const randomType = Math.floor(Math.random() * 3);
+				let randomChord;
+				
+				switch(randomType) {
+					case 0: // Maior
+						randomChord = randomNote;
+						break;
+					case 1: // Menor
+						randomChord = randomNote + 'm';
+						break;
+					case 2: // Diminuto
+						randomChord = randomNote + 'º';
+						break;
+				}
+				
+				if (!options.includes(randomChord) && randomChord !== correctChord) {
+					options.push(randomChord);
+				}
+			}
+			
+			// Embaralhar as opções
+			return shuffleArray(options);
+		}
+
+		// Embaralhar array
+		function shuffleArray(array) {
+			const newArray = [...array];
+			for (let i = newArray.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+			}
+			return newArray;
+		}
+
+		// Verificar resposta
+		function checkAnswer(selectedChord, correctChord, degreeIndex) {
+			// Parar todos os sons
+			stopAllSounds();
+			
+			// Desabilitar todos os botões de resposta
+			const answerButtons = document.querySelectorAll('.answer-btn');
+			answerButtons.forEach(button => {
+				button.disabled = true;
+			});
+			
+			// Tocar o acorde selecionado (se som estiver ativo)
+			playKeyboardChord(selectedChord);
+			
+			if (selectedChord === correctChord) {
+				// Resposta correta
+				feedbackElement.textContent = 'Correto!';
+				feedbackElement.className = 'feedback correct';
+				gameState.correctAnswers++;
+				gameState.usedChords[gameState.currentDegree] = correctChord;
+			} else {
+				// Resposta incorreta
+				feedbackElement.textContent = `Incorreto! A resposta correta é ${correctChord}`;
+				feedbackElement.className = 'feedback incorrect';
+				gameState.usedChords[gameState.currentDegree] = 'X';
+				
+				// Tocar o acorde correto após um breve delay (se som estiver ativo)
+				if (gameState.soundDuration > 0) {
+					setTimeout(() => playKeyboardChord(correctChord), 800);
+				}
+			}
+			
+			// Mostrar botão de próxima pergunta
+			nextQuestionBtn.style.display = 'inline-block';
+		}
+
+		// Próxima pergunta
+		function nextQuestion() {
+			gameState.currentDegree++;
+			
+			if (gameState.currentDegree < gameState.totalQuestions) {
+				updateGameDisplay();
+				generateQuestion();
+			} else {
+				// Fim do jogo
+				endGame();
+			}
+		}
+
+		// Finalizar jogo
+		function endGame() {
+			stopAllSounds();
+			currentQuestionElement.textContent = 'Fim do Jogo!';
+			answerButtonsContainer.innerHTML = '';
+			
+			const score = Math.round((gameState.correctAnswers / gameState.totalQuestions) * 100);
+			feedbackElement.textContent = `Você acertou ${gameState.correctAnswers} de ${gameState.totalQuestions} (${score}%)`;
+			feedbackElement.className = 'feedback';
+			
+			nextQuestionBtn.textContent = 'Jogar Novamente';
+			nextQuestionBtn.style.display = 'inline-block';
+			nextQuestionBtn.onclick = () => startGame(gameState.currentTone);
+			
+			// Atualizar progresso para 100%
+			progressElement.style.width = '100%';
+			
+			// Mostrar todas as respostas
+			updateUsedChordsDisplay();
+		}
+
+		// Atualizar exibição dos acordes usados no final do jogo
+		function updateUsedChordsDisplay() {
+			usedNotesContainer.innerHTML = '';
+			for (let i = 0; i < gameState.totalQuestions; i++) {
+				const chordElement = document.createElement('div');
+				chordElement.className = 'used-note';
+				chordElement.textContent = gameState.usedChords[i] || '?';
+				
+				if (gameState.usedChords[i] && gameState.usedChords[i] !== 'X') {
+					chordElement.classList.add('answered');
+				} else {
+					chordElement.classList.add('incorrect');
+				}
+				
+				usedNotesContainer.appendChild(chordElement);
+			}
+		}	
+	</script>
+</body>
+</html>
