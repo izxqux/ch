@@ -6,4 +6,4 @@
 
 ---
 
-https://izxqux.github.io/ch/
+[CH](https://izxqux.github.io/ch/)
